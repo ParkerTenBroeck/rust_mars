@@ -5,3 +5,6 @@ edition = "2021"
 
 [dependencies]
 rlib = { path = "../rlib" }
+
+[profile.release]
+opt-level = 'z' 

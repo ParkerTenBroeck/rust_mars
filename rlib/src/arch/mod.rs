@@ -20,7 +20,7 @@ pub fn print_i32(num: i32) {
     }
 }
 
-#[inline(always)]
+// #[inline(always)]
 pub fn print_cstr(str: &core::ffi::CStr){
     unsafe{
         syscall_s_v::<PRINT_STRING>(str.as_ptr() as u32)

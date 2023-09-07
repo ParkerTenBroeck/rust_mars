@@ -9,6 +9,7 @@ edition = "2021"
 llvm-tools = { version = "0.1.1" }
 # file-matcher = "0.7.0"
 walkdir = "2"
+regex = "*"
 
 # [build-dependencies]
 # llvm-tools-build = { version = "0.1", optional = true, package = "llvm-tools" }
