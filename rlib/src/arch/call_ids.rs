@@ -52,3 +52,24 @@ pub const PRINT_INTEGER_UNSIGNED: u32 = 36;
 
 /// $a0 is length of time to sleep in ms
 pub const SLEEP_MS: u32 = 32;
+
+
+/// $a0 is address of cstr
+/// $a0 is returned status 
+pub const CONFIRM_DIALOG: u32 = 50;
+
+
+pub const INPUT_DIALOG_INT: u32 = 51;
+
+pub const INPUT_DIALOG_FLOAT: u32 = 52;
+
+pub const INPUT_DIALOG_DOUBLE: u32 = 53;
+
+
+pub const INPUT_DIALOG_STRING: u32 = 54;
+
+pub const MESSAGE_DIALOG: u32 = 55;
+pub const MESSAGE_DIALOG_INT: u32 = 56;
+pub const MESSAGE_DIALOG_FLOAT: u32 = 57;
+pub const MESSAGE_DIALOG_DOUBLE: u32 = 58;
+pub const MESSAGE_DIALOG_STRING: u32 = 59;

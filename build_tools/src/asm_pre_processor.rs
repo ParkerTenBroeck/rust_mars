@@ -18,10 +18,10 @@ pub fn pre_processes_data_seg(raw: &[u8]) -> Result<String, Box<dyn std::error::
     }
 
     fn at_least_4(vals: &[u8]) -> bool{
-        if vals.len() < 4{
+        if vals.len() < 3{
             false
         }else{
-            for b in &vals[..4]{
+            for b in &vals[..3]{
                 if !what_i_want(*b){
                     return false;
                 }

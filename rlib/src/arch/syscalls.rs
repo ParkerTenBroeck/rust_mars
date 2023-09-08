@@ -237,26 +237,159 @@ pub fn sleep_ms(arg: i32) {
     }
 }
 
+
+
+#[derive(Debug)]
+pub enum ConfirmDialogResponse{
+    Yes,
+    No,
+    Cancel,
+}
 #[inline(always)]
-pub fn stack_pointer() -> u32 {
-    let sp;
+pub fn configm_dialog(message: &core::ffi::CStr) -> ConfirmDialogResponse{
     unsafe{
+        let out: i32; 
         core::arch::asm!{
-            "addi {sp}, $29, 0",
-            sp = out(reg) sp,
+            "syscall",
+            in("$2") CONFIRM_DIALOG,
+            inout("$4") message.as_ptr() => out
+        };
+
+        match out{
+            0 => ConfirmDialogResponse::Yes,
+            1 => ConfirmDialogResponse::No,
+            2 => ConfirmDialogResponse::Cancel,
+            _ => unreachable!()
         }
     }
-    sp
+}
+
+
+#[derive(Debug)]
+pub enum InputDialogResponse<T>{
+    Ok(T),
+    InputCannotBeParsed,
+    Canceled,
+    OkButNoData,
+    LengthOfInputExceededBuffer,
+}
+#[inline(always)]
+pub fn input_dialog_int(message: &core::ffi::CStr) -> InputDialogResponse<i32>{
+    unsafe{
+        let value: i32; 
+        let discriminant: i32;
+        core::arch::asm!{
+            "syscall",
+            in("$2") INPUT_DIALOG_INT,
+            inout("$4") message.as_ptr() => value,
+            out("$5") discriminant
+        };
+
+        match discriminant{
+            0 => InputDialogResponse::Ok(value),
+            -1 => InputDialogResponse::InputCannotBeParsed,
+            -2 => InputDialogResponse::Canceled,
+            -3 => InputDialogResponse::OkButNoData,
+            _ => unreachable!()
+        }
+    }
 }
 
 #[inline(always)]
-pub fn data_seg_end() -> u32 {
-    let out;
+pub fn input_dialog_f32(message: &core::ffi::CStr) -> InputDialogResponse<f32>{
     unsafe{
+        let value: f32; 
+        let discriminant: i32;
         core::arch::asm!{
-            "la {out}, _data_end",
-            out = out(reg) out,
+            "syscall",
+            in("$2") INPUT_DIALOG_FLOAT,
+            in("$4") message.as_ptr(),
+            out("$f0") value,
+            out("$5") discriminant
+        };
+
+        match discriminant{
+            0 => InputDialogResponse::Ok(value),
+            -1 => InputDialogResponse::InputCannotBeParsed,
+            -2 => InputDialogResponse::Canceled,
+            -3 => InputDialogResponse::OkButNoData,
+            _ => unreachable!()
         }
     }
-    out
+}
+
+#[inline(always)]
+pub fn input_dialog_f64(message: &core::ffi::CStr) -> InputDialogResponse<f64>{
+    unsafe{
+        let value: f64; 
+        let discriminant: i32;
+        core::arch::asm!{
+            "syscall",
+            in("$2") INPUT_DIALOG_DOUBLE,
+            in("$4") message.as_ptr(),
+            out("$f0") value,
+            out("$5") discriminant
+        };
+
+        match discriminant{
+            0 => InputDialogResponse::Ok(value),
+            -1 => InputDialogResponse::InputCannotBeParsed,
+            -2 => InputDialogResponse::Canceled,
+            -3 => InputDialogResponse::OkButNoData,
+            _ => unreachable!()
+        }
+    }
+}
+
+#[inline(always)]
+pub fn input_dialog_str(message: &core::ffi::CStr, buf: &mut [u8]) -> InputDialogResponse<usize>{
+    
+    let discriminant: i32;
+    unsafe{
+        core::arch::asm!{
+            "syscall",
+            in("$2") INPUT_DIALOG_STRING,
+            inout("$4") message.as_ptr() => discriminant,
+            in("$5") buf.as_ptr(),
+            in("$6") buf.len()
+        };
+    }
+
+    match discriminant{
+        0 => {
+            let mut len = 1;
+            for byte in buf{
+                if *byte == 0{
+                    break;
+                }
+                len += 1;
+            }
+            InputDialogResponse::Ok(len)
+        },
+        -1 => InputDialogResponse::InputCannotBeParsed,
+        -2 => InputDialogResponse::Canceled,
+        -3 => InputDialogResponse::OkButNoData,
+        -4 => InputDialogResponse::LengthOfInputExceededBuffer,
+        _ => unreachable!()
+    }
+}
+
+pub enum MessageKind{
+    Error = 0,
+    Information = 1,
+    Warning = 2,
+    Question = 3,
+    Plain = 4,
+}
+
+#[inline(always)]
+pub fn message_dialog(kind: MessageKind, message: &core::ffi::CStr){
+    unsafe{
+        core::arch::asm!{
+            "syscall",
+            in("$2") MESSAGE_DIALOG,
+            in("$4") message.as_ptr(),
+            in("$5") kind as u32
+        }
+    }
 }

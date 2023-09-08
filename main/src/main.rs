@@ -9,10 +9,20 @@ static mut TEST: u32 = 2;
 #[no_mangle]
 pub fn main() {
 
-    rlib::rt::str_to_cstr("test string!\n", |cstr|{
-        rlib::arch::print_cstr(cstr);
-    });
+    // let res = rlib::rt::str_to_cstr("test string!\n", |cstr|{
+    //     rlib::arch::input_dialog_int(cstr)
+    // });
+    // println!("{:#?}", res);
 
+    rlib::arch::message_dialog(arch::MessageKind::Error, rlib::cstr!("Error :O"));
+    rlib::arch::message_dialog(arch::MessageKind::Warning, rlib::cstr!("Warning >:)"));
+    rlib::arch::message_dialog(arch::MessageKind::Information, rlib::cstr!("UwU"));
+    rlib::arch::message_dialog(arch::MessageKind::Question, rlib::cstr!(">.<"));
+    rlib::arch::message_dialog(arch::MessageKind::Plain, rlib::cstr!("'*'"));
+
+    if true{
+        rlib::arch::halt_code(5);
+    }
 
     let val = rlib::arch::read_stdin_i32();
     if val <= 34{
