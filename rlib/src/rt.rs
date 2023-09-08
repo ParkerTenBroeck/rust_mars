@@ -50,7 +50,7 @@ pub fn str_to_cstr<R>(str: &str, usage: impl FnOnce(&core::ffi::CStr) -> R) -> R
 #[panic_handler]
 #[cfg(feature = "provide_panic_handler")]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    // crate::println!("PANIC AT THE DISCO: {:#?}", info);
+    crate::println!("PANIC AT THE DISCO: {:#?}", info);
     loop {
         crate::arch::halt();
     }

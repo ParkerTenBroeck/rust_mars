@@ -9,48 +9,48 @@ static mut TEST: u32 = 2;
 #[no_mangle]
 pub fn main() {
 
-    rlib::rt::str_to_cstr("test string!", |cstr|{
+    rlib::rt::str_to_cstr("test string!\n", |cstr|{
         rlib::arch::print_cstr(cstr);
     });
 
 
-    // let val = rlib::arch::read_stdin_i32();
-    // if val <= 34{
-    //     println!("{}", factorial(val as u128));
-    // }else{
-    //     println!("Number too large! >.<");
-    // }
-    // rlib::arch::sleep_ms(3000);
+    let val = rlib::arch::read_stdin_i32();
+    if val <= 34{
+        println!("{}", factorial(val as u128));
+    }else{
+        println!("Number too large! >.<");
+    }
+    rlib::arch::sleep_ms(3000);
 
-    // rlib::arch::print_str("asdasdasd\n");
-    // for c in 'a'..='z'{
-    //     rlib::arch::print_char(c);
-    // }
+    rlib::arch::print_str("asdasdasd\n");
+    for c in 'a'..='z'{
+        rlib::arch::print_char(c);
+    }
 
-    // unsafe{TEST = black_box(10);}
+    unsafe{TEST = black_box(10);}
 
-    // for _ in 0..500{
-    //     let val = rlib::arch::systime();
-    //     unsafe{TEST = val as u32;};
+    for _ in 0..500{
+        let val = rlib::arch::systime();
+        unsafe{TEST = val as u32;};
 
-    //     if unsafe{TEST == 55}{
-    //         break;
-    //     }
-    //     println!("{}", val);
-    //     // println!("{:?}", rlib::arch::systime());
-    //     // rand_fn(val);
-    //     // rlib::arch::print_i32_hex((val >> 32) as u32);
-    //     // rlib::arch::print_i32_hex(val as u32);
-    //     // rlib::arch::print_char('\n');
-    //     // println!("{}", rlib::arch::systime());
-    // }
+        if unsafe{TEST == 55}{
+            break;
+        }
+        println!("{}", val);
+        // println!("{:?}", rlib::arch::systime());
+        // rand_fn(val);
+        // rlib::arch::print_i32_hex((val >> 32) as u32);
+        // rlib::arch::print_i32_hex(val as u32);
+        // rlib::arch::print_char('\n');
+        // println!("{}", rlib::arch::systime());
+    }
 
 
     // // rand_fn();
     // // rand_fn();
     // // test();
-    // // let mem = rlib::arch::sbrk(10);
-    // // println!("{:?}", mem.as_ptr());
+    // let mem = rlib::arch::sbrk(10);
+    // println!("{:?}", mem.as_ptr());
 
     // // let mem = &mut [0u8; 32];
     // let sp = rlib::arch::stack_pointer();
@@ -72,12 +72,12 @@ pub fn main() {
     // let mem = &mut [0u8; 32];
     // println!("{:?}", mem);
 
-    // let v1 = black_box(12.0);
-    // rlib::arch::print_f32(55.0 * v1);
-    // rlib::arch::print_char('\n');
-    // rlib::arch::print_f64(55.0 * (v1 as f64));
-    // rlib::arch::print_char('\n');
-    // rlib::arch::print_cstr(rlib::cstr!("Hello\n"));
+    let v1 = black_box(12.0);
+    rlib::arch::print_f32(55.0 * v1);
+    rlib::arch::print_char('\n');
+    rlib::arch::print_f64(55.0 * (v1 as f64));
+    rlib::arch::print_char('\n');
+    rlib::arch::print_cstr(rlib::cstr!("Hello\n"));
 }
 
 pub fn factorial(val: u128) -> u128{

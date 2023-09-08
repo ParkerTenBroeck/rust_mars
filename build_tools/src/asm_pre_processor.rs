@@ -7,18 +7,79 @@ pub fn pre_processes_data_seg(raw: &[u8]) -> Result<String, Box<dyn std::error::
     if raw.len() == 0{
         return Ok(String::new())
     }
-    // let mut val = String::new();
-    let mut val = ".byte ".to_owned();
 
-    // std::str::f
-
-    for byte in raw{
-        // val.push_str(".byte ");
-        val.push_str(&format!("{:}", *byte as i8));
-        val.push(' ');
+    enum Stupid{
+        String(String),
+        Bytes(Vec<u8>),
     }
 
-    Ok(val)
+    fn what_i_want(b: u8) -> bool{
+        matches!(b, 32..=126)
+    }
+
+    fn at_least_4(vals: &[u8]) -> bool{
+        if vals.len() < 4{
+            false
+        }else{
+            for b in &vals[..4]{
+                if !what_i_want(*b){
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    let mut stupid = if at_least_4(raw){
+        Stupid::String(String::new())
+    }else{
+        Stupid::Bytes(Vec::new())
+    };
+
+    let mut output_string = String::new();
+
+    for (index, byte) in raw.iter().enumerate(){
+        match &mut stupid{
+            Stupid::String(string) => {
+                if what_i_want(*byte){
+                    string.push(*byte as char);
+                }else{
+                    output_string.push_str(".ascii ");
+                    output_string.push_str(&format!("{:?}\n", string));
+                    stupid = Stupid::Bytes(vec![*byte])
+                }
+            },
+            Stupid::Bytes(bytes) => {
+                if at_least_4(&raw[index..]){
+                    output_string.push_str(".byte ");
+                    for b in bytes{
+                        output_string.push_str(&format!("{} ", *b as i8));
+                    }
+                    output_string.push('\n');
+                    stupid = Stupid::String((*byte as char).into())
+                }else{
+                    bytes.push(*byte);
+                }
+            },
+        }
+
+    }
+
+    match &mut stupid{
+        Stupid::String(string) => {
+            output_string.push_str(".ascii ");
+            output_string.push_str(&format!("{:?}", string));    
+        },
+        Stupid::Bytes(bytes) => {
+            output_string.push_str(".byte ");
+            for b in bytes{
+                output_string.push_str(&format!("{} ", *b as i8));
+            }
+            output_string.push('\n');
+        },
+    }
+
+    Ok(output_string)
 }
 
 pub fn create_asm(binary: &Path) -> Result<PathBuf, Box<dyn std::error::Error>>{
