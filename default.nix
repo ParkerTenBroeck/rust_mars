@@ -2,12 +2,12 @@
 let
   rustupToolchain = "nightly";
 
-  rustBuildTargetTripple = "mips-unknown-linux-gnu";
+  rustBuildTargetTripple = "mipsel-unknown-none";
   rustBuildHostTripple = "x86_64-unknown-linux-gnu";
 
   mips-cross = import pkgs.path {
     crossSystem = {
-      config = "mips-linux-gnu";
+      config = "mipsel-linux-gnu";
     };
   };
 

@@ -25,7 +25,7 @@ pub fn create_asm(binary: &Path) -> Result<PathBuf, Box<dyn std::error::Error>>{
     owned.push("out.asm");
 
     let mut final_out = {
-        let mut run_cmd = Command::new("mips-linux-gnu-objdump");
+        let mut run_cmd = Command::new("mipsel-linux-gnu-objdump");
         run_cmd.arg("-d");
         run_cmd.arg(binary.to_str().expect("Invalid Path"));
         run_cmd.arg("-M");
@@ -43,7 +43,7 @@ pub fn create_asm(binary: &Path) -> Result<PathBuf, Box<dyn std::error::Error>>{
         pre_processes_text(output)?
     };
     {
-        let mut run_cmd = Command::new("mips-linux-gnu-objcopy");
+        let mut run_cmd = Command::new("mipsel-linux-gnu-objcopy");
         // run_cmd.arg("-d");
         run_cmd.arg(binary.to_str().expect("Invalid Path"));
         run_cmd.arg("--dump-section");
@@ -60,7 +60,7 @@ pub fn create_asm(binary: &Path) -> Result<PathBuf, Box<dyn std::error::Error>>{
         final_out.push('\n');
     }
     {
-        let mut run_cmd = Command::new("mips-linux-gnu-objcopy");
+        let mut run_cmd = Command::new("mipsel-linux-gnu-objcopy");
         // run_cmd.arg("-d");
         run_cmd.arg(binary.to_str().expect("Invalid Path"));
         run_cmd.arg("--dump-section");
@@ -77,7 +77,7 @@ pub fn create_asm(binary: &Path) -> Result<PathBuf, Box<dyn std::error::Error>>{
         final_out.push('\n');
     }
     {
-        let mut run_cmd = Command::new("mips-linux-gnu-objcopy");
+        let mut run_cmd = Command::new("mipsel-linux-gnu-objcopy");
         // run_cmd.arg("-d");
         run_cmd.arg(binary.to_str().expect("Invalid Path"));
         run_cmd.arg("--dump-section");
@@ -94,7 +94,7 @@ pub fn create_asm(binary: &Path) -> Result<PathBuf, Box<dyn std::error::Error>>{
         final_out.push('\n');
     }
     {
-        let mut run_cmd = Command::new("mips-linux-gnu-objcopy");
+        let mut run_cmd = Command::new("mipsel-linux-gnu-objcopy");
         // run_cmd.arg("-d");
         run_cmd.arg(binary.to_str().expect("Invalid Path"));
         run_cmd.arg("--dump-section");

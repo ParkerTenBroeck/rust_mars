@@ -6,11 +6,12 @@
   "executables": true,
   "features": "+mips1,+mips2,-ptr64,-gp64,+xgot,-soft-float",
   "llvm-target": "mipsel-unknown-none",
+  "singlethread": true,
   "max-atomic-width": 32,
-  "linker": "mips-linux-gnu-ld",
+  "linker": "mipsel-linux-gnu-ld",
   "linker-flavor": "ld",
   "disable-redzone": true,
-  "position-independent-executables": true,
+  "position-independent-executables": false,
   "relro-level": "full",
   "target-endian": "little",
   "target-mcount": "_mcount",
@@ -20,8 +21,7 @@
   "relocation-model": "static",
   "pre-link-args": {
     "ld": [
-        "--script=./link.map",
-        "-EL"
+        "--script=./link.map"
     ]
   },
   "llvm-args": [

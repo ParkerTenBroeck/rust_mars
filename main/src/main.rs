@@ -16,7 +16,13 @@ pub fn main() {
     unsafe{TEST = black_box(10);}
 
     for _ in 0..500{
-        // let val = rlib::arch::systime();
+        let val = rlib::arch::systime();
+        unsafe{TEST = val as u32;};
+
+        if unsafe{TEST == 55}{
+            break;
+        }
+        println!("{}", val);
         // println!("{:?}", rlib::arch::systime());
         // rand_fn(val);
         // rlib::arch::print_i32_hex((val >> 32) as u32);
@@ -24,7 +30,7 @@ pub fn main() {
         // rlib::arch::print_char('\n');
         // println!("{}", rlib::arch::systime());
     }
-    
+
 
     // rand_fn();
     // rand_fn();
@@ -32,11 +38,13 @@ pub fn main() {
     // let mem = rlib::arch::sbrk(10);
     // println!("{:?}", mem.as_ptr());
 
-    let mem = rlib::arch::sbrk(unsafe{TEST});
+    // let mem = rlib::arch::sbrk(unsafe{TEST});
+    let mem = &mut [0u8; 32];
     println!("{:?}", mem.as_ptr());
     // // rlib::arch::print_i32(mem as i32);
-    let mem = rlib::arch::sbrk(32);
+    // let mem = rlib::arch::sbrk(32);
     // rlib::arch::print_i32(mem as i32);
+    let mem = &mut [0u8; 32];
     println!("{:?}", mem);
 
     let v1 = black_box(12.0);
