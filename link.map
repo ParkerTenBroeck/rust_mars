@@ -66,6 +66,7 @@ SECTIONS
         . = ALIGN(0x8);
         *(.bss*)   
     }
+    _data_end = .;
     
     . = 0x10040000;
     . = ALIGN(0x8);

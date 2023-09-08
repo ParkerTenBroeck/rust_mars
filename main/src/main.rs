@@ -38,9 +38,19 @@ pub fn main() {
     // let mem = rlib::arch::sbrk(10);
     // println!("{:?}", mem.as_ptr());
 
-    // let mem = rlib::arch::sbrk(unsafe{TEST});
-    let mem = &mut [0u8; 32];
-    println!("{:?}", mem.as_ptr());
+    // let mem = &mut [0u8; 32];
+    let sp = rlib::arch::stack_pointer();
+    rlib::arch::print_i32_hex(sp);
+    rlib::arch::print_char('\n');
+
+    let sp = rlib::arch::data_seg_end();
+    rlib::arch::print_i32_hex(sp);
+    rlib::arch::print_char('\n');
+
+    for _ in 0..1000{
+        let mem = rlib::arch::sbrk(unsafe{10});
+        println!("{:?}, {}, {:?}", mem.as_ptr(), mem.len(), mem);
+    }
     // // rlib::arch::print_i32(mem as i32);
     // let mem = rlib::arch::sbrk(32);
     // rlib::arch::print_i32(mem as i32);

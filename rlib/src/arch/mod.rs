@@ -135,6 +135,17 @@ pub fn stack_pointer() -> u32 {
     sp
 }
 
+pub fn data_seg_end() -> u32 {
+    let out;
+    unsafe{
+        core::arch::asm!{
+            "la {out}, _data_end",
+            out = out(reg) out,
+        }
+    }
+    out
+}
+
 // #[inline(always)]
 // pub fn print_zero_term_str(str: &str) {
 //     unsafe {
