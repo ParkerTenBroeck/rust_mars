@@ -73,3 +73,9 @@ pub const MESSAGE_DIALOG_INT: u32 = 56;
 pub const MESSAGE_DIALOG_FLOAT: u32 = 57;
 pub const MESSAGE_DIALOG_DOUBLE: u32 = 58;
 pub const MESSAGE_DIALOG_STRING: u32 = 59;
+
+
+pub const OPEN_FILE: u32 = 13;
+pub const READ_FROM_FILE: u32 = 14;
+pub const WRITE_TO_FILE: u32 = 15;
+pub const CLOSE_FILE: u32 = 16;

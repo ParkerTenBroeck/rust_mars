@@ -393,3 +393,90 @@ pub fn message_dialog(kind: MessageKind, message: &core::ffi::CStr){
         }
     }
 }
+
+
+pub const STDIN: FileDesciptor = FileDesciptor(0);
+pub const STDOUT: FileDesciptor = FileDesciptor(1);
+pub const STDERR: FileDesciptor = FileDesciptor(2);
+
+#[derive(Debug, Clone, Copy)]
+pub struct FileDesciptor(u32);
+
+#[derive(Debug)]
+pub struct FileIOErrorCode(i32);
+
+#[derive(Debug, Clone, Copy)]
+pub enum FileFlag{
+    Read = 0,
+    Write = 1,
+    WriteOnlyWithCreateAppend = 9,
+}
+
+#[inline(always)]
+pub unsafe fn open_file(file: &core::ffi::CStr, flag: FileFlag) -> Result<FileDesciptor, FileIOErrorCode>{
+    let res: i32;
+    unsafe{
+        core::arch::asm!{
+            "syscall",
+            inout("$2") OPEN_FILE => res,
+            in("$4") file.as_ptr(),
+            in("$5") flag as u32,
+            in("$6") 0
+        }
+    }
+    if res < 0{
+        Err(FileIOErrorCode(res))
+    }else{
+        Ok(FileDesciptor(res as u32))
+    }
+}
+
+#[inline(always)]
+pub unsafe fn read_file(file: &FileDesciptor, buf: &mut [u8]) -> Result<usize, FileIOErrorCode>{
+    let res: i32;
+    unsafe{
+        core::arch::asm!{
+            "syscall",
+            inout("$2") READ_FROM_FILE => res,
+            in("$4") file.0,
+            in("$5") buf.as_ptr(),
+            in("$6") buf.len()
+        }
+    }
+    if res < 0{
+        Err(FileIOErrorCode(res))
+    }else{
+        Ok(res as usize)
+    }
+}
+
+#[inline(always)]
+pub unsafe fn write_file(file: &mut FileDesciptor, buf: &[u8]) -> Result<usize, FileIOErrorCode>{
+    let res: i32;
+    unsafe{
+        core::arch::asm!{
+            "syscall",
+            inout("$2") WRITE_TO_FILE => res,
+            in("$4") file.0,
+            in("$5") buf.as_ptr(),
+            in("$6") buf.len()
+        }
+    }
+    if res < 0{
+        Err(FileIOErrorCode(res))
+    }else{
+        Ok(res as usize)
+    }
+}
+
+
+#[inline(always)]
+pub unsafe fn close_file(file: FileDesciptor){
+    unsafe{
+        core::arch::asm!{
+            "syscall",
+            in("$2") CLOSE_FILE,
+            in("$4") file.0
+        }
+    }
+}

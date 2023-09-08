@@ -100,9 +100,9 @@ pub fn build_vm_binary(name: &str) -> PathBuf {
         .arg("mips.json")
         .arg("-Zbuild-std=core,compiler_builtins")
         .arg("-Zbuild-std-features=compiler-builtins-mem")
-        .arg("--")
-        .arg("-C")
-        .arg("opt-level=z")
+        // .arg("--")
+        // .arg("-C")
+        // .arg("opt-level=z")
         ;
 
     assert!(run_cmd.status().unwrap().success());
