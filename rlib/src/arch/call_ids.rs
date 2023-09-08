@@ -45,3 +45,10 @@ pub const SYSTEM_TIME_MS: u32 = 30;
 
 /// $a0 is integer to print
 pub const PRINT_INTEGER_HEX: u32 = 34;
+/// $a0 is integer to print
+pub const PRINT_INTEGER_BIN: u32 = 35;
+/// $a0 is integer to print
+pub const PRINT_INTEGER_UNSIGNED: u32 = 36;
+
+/// $a0 is length of time to sleep in ms
+pub const SLEEP_MS: u32 = 32;

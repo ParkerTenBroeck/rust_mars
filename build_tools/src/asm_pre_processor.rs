@@ -10,6 +10,8 @@ pub fn pre_processes_data_seg(raw: &[u8]) -> Result<String, Box<dyn std::error::
     // let mut val = String::new();
     let mut val = ".byte ".to_owned();
 
+    // std::str::f
+
     for byte in raw{
         // val.push_str(".byte ");
         val.push_str(&format!("{:}", *byte as i8));

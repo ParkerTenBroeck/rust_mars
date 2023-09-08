@@ -55,6 +55,7 @@ fn main() {
         path.push("Mars4_5.jar");
         run_cmd.arg(path.to_str().expect("Failed to make MARS jar path"));
         
+        // run_cmd.arg("db");
         run_cmd.arg(asm.as_ref().map(|f|f.to_str()).flatten().ok_or("Failed to get/make asm path").unwrap());
 
         assert!(run_cmd.status().is_ok())
@@ -86,6 +87,9 @@ pub fn build_vm_binary(name: &str) -> PathBuf {
     let mut run_cmd = Command::new("cargo");
     run_cmd.current_dir(std::env::current_dir().unwrap());
 
+    run_cmd.env("CC", "mipsel-linux-gnu-gcc");
+    run_cmd.env("CFLAGS", "-fno-delayed-branch");
+    
     run_cmd
     .arg("+nightly")
         .arg("rustc")
