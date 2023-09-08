@@ -43,7 +43,7 @@ SECTIONS
     }
 
     . = 0x10010000;
-        .rodata : 
+    .rodata : 
     {
         . = ALIGN(0x8);
         *(.rodata)
@@ -73,35 +73,11 @@ SECTIONS
     . = ALIGN(0x8);
 
 
-    . = 0x7fffeffc;
+    . = 0x80000000;
+    . = ALIGN(0x8);
     _stack_start = .;
     _sp = _stack_start;
 
-    _stack_base = 0x7ffffffc;
-
-
-    
-
-
-    .pload : 
-    {
-        . = 0x00400000;
-        . = ALIGN(0x8);
-        *(.text)
-        . = 0x10008000;
-        . = ALIGN(0x8);
-        *(.got)
-        . = 0x10010000;
-        . = ALIGN(0x8);
-        *(.rodata)
-        . = ALIGN(0x8);
-        *(.data)
-        . = ALIGN(0x8);
-        *(.bss)
-
-        *(.headers)
-        *(.code)
-    }
-
+    //_stack_base = 0x7ffffffc;
     
 }

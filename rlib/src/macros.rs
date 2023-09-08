@@ -15,3 +15,11 @@ macro_rules! println {
         drop(out);
     };
 }
+
+
+#[macro_export]
+macro_rules! cstr {
+    ($data:literal) => {
+        unsafe { CStr::from_ptr(&concat!($data, "\0").as_bytes()[0] as *const u8 as *const i8) }
+    }
+}

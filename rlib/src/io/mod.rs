@@ -17,12 +17,14 @@ impl StdOutRaw {
 }
 
 pub struct StdOut {
-    lock: MutexGuard<'static, StdOutRaw>,
+    // lock: MutexGuard<'static, StdOutRaw>,
+    inner: StdOutRaw,
 }
 
 impl Drop for StdOut {
     fn drop(&mut self) {
-        self.lock.flush()
+        self.inner.flush()
+        // self.lock.flush()
     }
 }
 
@@ -30,13 +32,13 @@ static STDOUT: Mutex<StdOutRaw> = Mutex::new(StdOutRaw);
 
 pub fn stdout() -> StdOut {
     StdOut {
-        lock: STDOUT.lock(),
+        inner: StdOutRaw
     }
 }
 
 impl core::fmt::Write for StdOut {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        self.lock.write_str(s);
+        self.inner.write_str(s);
         Ok(())
     }
 }
