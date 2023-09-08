@@ -1,12 +1,10 @@
-use crate::sync::{Mutex, MutexGuard};
-
 pub mod file;
 
 struct StdOutRaw;
 
 impl StdOutRaw {
     fn write_str(&mut self, s: &str) {
-        for char in s.chars(){
+        for char in s.chars() {
             crate::arch::print_char(char)
         }
     }
@@ -28,12 +26,10 @@ impl Drop for StdOut {
     }
 }
 
-static STDOUT: Mutex<StdOutRaw> = Mutex::new(StdOutRaw);
+// static STDOUT: Mutex<StdOutRaw> = Mutex::new(StdOutRaw);
 
 pub fn stdout() -> StdOut {
-    StdOut {
-        inner: StdOutRaw
-    }
+    StdOut { inner: StdOutRaw }
 }
 
 impl core::fmt::Write for StdOut {

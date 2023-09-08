@@ -1,4 +1,8 @@
-use std::{path::{PathBuf, Path}, process::Command, str::FromStr};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+    str::FromStr,
+};
 
 use asm_pre_processor::create_asm;
 
@@ -37,7 +41,7 @@ fn main() {
         assert!(run_cmd.status().unwrap().success());
     }
 
-    let mut obj = None;
+    // let mut obj = None;
     // let mut bin = None;
     let mut asm = None;
     if build {
@@ -45,7 +49,7 @@ fn main() {
         // bin = Some(create_raw_binary("main"));
         asm = Some(create_assembly(&obj_t));
 
-        obj = Some(obj_t);
+        // obj = Some(obj_t);
     }
 
     if run {
@@ -54,9 +58,15 @@ fn main() {
         let mut path = workspace_path();
         path.push("Mars4_5.jar");
         run_cmd.arg(path.to_str().expect("Failed to make MARS jar path"));
-        
+
         // run_cmd.arg("db");
-        run_cmd.arg(asm.as_ref().map(|f|f.to_str()).flatten().ok_or("Failed to get/make asm path").unwrap());
+        run_cmd.arg(
+            asm.as_ref()
+                .map(|f| f.to_str())
+                .flatten()
+                .ok_or("Failed to get/make asm path")
+                .unwrap(),
+        );
 
         assert!(run_cmd.status().is_ok())
     }
@@ -89,7 +99,7 @@ pub fn build_vm_binary(name: &str) -> PathBuf {
 
     run_cmd.env("CC", "mipsel-linux-gnu-gcc");
     run_cmd.env("CFLAGS", "-fno-delayed-branch");
-    
+
     run_cmd
     .arg("+nightly")
         .arg("rustc")

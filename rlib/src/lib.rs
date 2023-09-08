@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(internal_features)]
 #![feature(concat_idents)]
 #![feature(lang_items)]
 #![feature(allow_internal_unstable)]
@@ -19,9 +20,7 @@ compile_error!("ONLY MIPS ARCHITECTURE SUPPORTED");
 #[cfg(not(target_endian = "little"))]
 compile_error!("NOT LITTLE ENDIAN");
 
-
 pub mod prelude;
-
 
 pub mod arch;
 pub mod io;
@@ -36,7 +35,6 @@ extern crate alloc as alloc_crate;
 
 #[cfg(feature = "alloc")]
 pub use alloc_crate::*;
-
 
 pub mod macros;
 pub use macros::*;

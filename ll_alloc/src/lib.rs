@@ -119,21 +119,21 @@ impl AllocInner {
         }
     }
 
-    pub fn unused_gap_bytes(&self) -> usize{
+    pub fn unused_gap_bytes(&self) -> usize {
         let mut gaps = 0;
         let mut node = self.first;
         while let Some(next) = node {
-            unsafe{
+            unsafe {
                 node = next.as_ref().next;
-            
-                if let Some(next_next) = node{
+
+                if let Some(next_next) = node {
                     gaps += next_next.addr().get() - (next.addr().get() + next.as_ref().size)
                 }
             }
         }
         return gaps;
     }
-    
+
     #[allow(unused)]
     unsafe fn allocate_infront(
         &mut self,

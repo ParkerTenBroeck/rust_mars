@@ -33,16 +33,14 @@ pub unsafe fn heap_address() -> *mut u8 {
     ret
 }
 
-pub fn str_to_cstr<R>(str: &str, usage: impl FnOnce(&core::ffi::CStr) -> R) -> R{
-    stackalloc::stackalloc_uninit::<u8, _, _>(str.len() + 1, |v|{
-        let v: &mut [u8] = unsafe{
+pub fn str_to_cstr<R>(str: &str, usage: impl FnOnce(&core::ffi::CStr) -> R) -> R {
+    stackalloc::stackalloc_uninit::<u8, _, _>(str.len() + 1, |v| {
+        let v: &mut [u8] = unsafe {
             str.as_ptr().copy_to(v.as_mut_ptr().cast(), str.len());
             v.as_mut_ptr().add(str.len()).write(MaybeUninit::new(0));
             core::mem::transmute(v)
         };
-        let cstr = unsafe{
-            core::ffi::CStr::from_ptr(v.as_ptr().cast())
-        };
+        let cstr = unsafe { core::ffi::CStr::from_ptr(v.as_ptr().cast()) };
         usage(cstr)
     })
 }
@@ -50,7 +48,7 @@ pub fn str_to_cstr<R>(str: &str, usage: impl FnOnce(&core::ffi::CStr) -> R) -> R
 #[panic_handler]
 #[cfg(feature = "provide_panic_handler")]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    // crate::println!("PANIC AT THE DISCO: {:#?}", info);
+    crate::println!("PANIC AT THE DISCO: {:#?}", info);
     loop {
         crate::arch::halt();
     }

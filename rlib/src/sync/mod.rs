@@ -20,6 +20,5 @@ pub struct VmRelax;
 
 impl RelaxStrategy for VmRelax {
     #[inline(always)]
-    fn relax() {
-    }
+    fn relax() {}
 }
