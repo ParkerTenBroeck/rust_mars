@@ -1,3 +1,5 @@
+use core::ops::{Range, RangeInclusive};
+
 pub use super::call_ids::*;
 
 #[inline(always)]
@@ -231,6 +233,77 @@ pub fn sleep_ms(arg: i32) {
             in("$4") arg
         }
     }
+}
+
+#[inline]
+pub unsafe fn set_seed(rand_id: u32, seed: u32) {
+    core::arch::asm!{
+        "syscall",
+        in("$2") SET_RAND_SEED,
+        in("$4") rand_id,
+        in("$5") seed
+    }
+}
+
+#[inline]
+pub unsafe fn next_rand_int(rand_id: u32) -> u32 {
+    let out;
+    core::arch::asm!{
+        "syscall",
+        in("$2") GET_RAND_INT,
+        inout("$4") rand_id => out
+    }
+    out
+}
+
+#[inline]
+pub unsafe fn next_rand_int_range(rand_id: u32, range: Range<i32>) -> i32 {
+    let out: i32;
+    let calc_bound = range.end - range.start;
+    core::arch::asm!{
+        "syscall",
+        in("$2") GET_RAND_INT_RANGE,
+        inout("$4") rand_id => out,
+        in("$5") calc_bound,
+    }
+    out + range.start
+}
+
+#[inline]
+pub unsafe fn next_rand_int_range_inclusive(rand_id: u32, range: RangeInclusive<i32>) -> i32 {
+    let out: i32;
+    let calc_bound = range.end() - range.start() + 1;
+    core::arch::asm!{
+        "syscall",
+        in("$2") GET_RAND_INT_RANGE,
+        inout("$4") rand_id => out,
+        in("$5") calc_bound,
+    }
+    out + range.start()
+}
+
+#[inline]
+pub unsafe fn next_rand_f32(rand_id: u32) -> f32 {
+    let out;
+    core::arch::asm!{
+        "syscall",
+        in("$2") GET_RAND_FLOAT,
+        in("$4") rand_id,
+        out("$f0") out
+    }
+    out
+}
+
+#[inline]
+pub unsafe fn next_rand_f64(rand_id: u32) -> f64 {
+    let out;
+    core::arch::asm!{
+        "syscall",
+        in("$2") GET_RAND_DOUBLE,
+        in("$4") rand_id,
+        out("$f0") out
+    }
+    out
 }
 
 #[derive(Debug)]
