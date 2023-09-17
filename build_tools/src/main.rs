@@ -10,7 +10,7 @@ pub mod asm_pre_processor;
 
 fn main() {
     let args = std::env::args().skip(1).peekable(); // skip executable name
-
+    
     let mut run = false;
     let mut build = false;
     let mut clean = false;
@@ -59,7 +59,8 @@ fn main() {
         path.push("Mars4_5.jar");
         run_cmd.arg(path.to_str().expect("Failed to make MARS jar path"));
 
-        // run_cmd.arg("db");
+        run_cmd.arg("we");
+        run_cmd.arg("np");
         run_cmd.arg(
             asm.as_ref()
                 .map(|f| f.to_str())
@@ -108,7 +109,7 @@ pub fn build_vm_binary(name: &str) -> PathBuf {
         .arg(name)
         .arg("--target")
         .arg("mips.json")
-        .arg("-Zbuild-std=core,compiler_builtins")
+        .arg("-Zbuild-std=core,compiler_builtins,alloc")
         .arg("-Zbuild-std-features=compiler-builtins-mem")
         // .arg("--")
         // .arg("-C")

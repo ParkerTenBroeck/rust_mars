@@ -249,8 +249,30 @@ pub fn pre_processes_text(vals: String) -> Result<String, Box<dyn std::error::Er
                     "teq" => {
                         // let oper = oper.trim_end_matches(|c| matches!(c, ' '|'0'..='9',','));
                         let oper = &oper[..5];
-                        instructions.push((line.0, format!("{ins} {oper}")));
+                        instructions.push((line.0, format!("{ins}\t{oper}")));
                     }
+                    "negu" => {
+                        let (left, right) = oper.split_once(',').expect("Malformed operands");
+                        instructions.push((line.0, format!("subu\t{},$0,{}", left, right)));
+                    }
+                    "divu" => {
+                        if oper.starts_with("$0") && oper.matches(',').count() == 2{
+                            instructions.push((line.0, format!("{ins}\t{}", oper.trim_start_matches("$0,"))))
+                        }else{
+                            instructions.push(line);
+                        }
+                    }
+                    "c.un.d" => {
+                        instructions.push((line.0, "c.eq.d\t1,$f0,$f0".into()));
+                        // instructions.push((line.0, "c.eq.d 1,$f0,$f0".into()));
+                        // instructions.push((line.0, "c.eq.d 1,$f0,$f0".into()));
+                        // instructions.push((line.0, "c.eq.d 1,$f0,$f0".into()));
+                        // instructions.push((line.0, "c.eq.d 1,$f0,$f0".into()));
+                    },
+                    "c.un.s" => {
+                        instructions.push((line.0, "c.eq.s\t1,$f0,$f0".into()));
+                        // instructions.push((line.0, "c.eq.s 1,$f0,$f0".into()));
+                    },
                     "sync" => {} //skip
                     _ => {
                         instructions.push(line);
@@ -276,7 +298,16 @@ pub fn pre_processes_text(vals: String) -> Result<String, Box<dyn std::error::Er
     res.push('\n');
     res.push('\n');
 
+    let mut last_addr = None;
+
     for (addr, instruction) in instructions.into_iter() {
+        if let Some(last_addr) = last_addr{
+            if last_addr + 4 != addr{
+                // panic!("Address bruh: {last_addr} -> {addr}")
+            }
+        }
+        last_addr = Some(addr);
+        
         if let Some(labels) = labels.remove(&addr) {
             res.push('\n');
             for label in labels {
