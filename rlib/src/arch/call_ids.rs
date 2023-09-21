@@ -73,10 +73,11 @@ pub const READ_FROM_FILE: u32 = 14;
 pub const WRITE_TO_FILE: u32 = 15;
 pub const CLOSE_FILE: u32 = 16;
 
-
-
 pub const SET_RAND_SEED: u32 = 40;
 pub const GET_RAND_INT: u32 = 41;
 pub const GET_RAND_INT_RANGE: u32 = 42;
 pub const GET_RAND_FLOAT: u32 = 43;
 pub const GET_RAND_DOUBLE: u32 = 44;
+
+pub const MIDI_OUT: u32 = 31;
+pub const MIDI_OUT_SYNC: u32 = 33;

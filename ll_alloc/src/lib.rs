@@ -189,6 +189,23 @@ impl AllocInner {
     }
 }
 
+fn gen_first_node() -> NonNull<Node> {
+    let heap_start_align = core::mem::align_of::<Node>();
+    let addr = unsafe { rlib::rt::heap_address() };
+    let addr = addr as usize;
+    let addr = addr + core::mem::size_of::<Node>();
+    let addr = (addr + heap_start_align - 1) & !(heap_start_align - 1);
+    let heap_start = addr + core::mem::size_of::<Node>();
+    let heap_start: *mut Node = core::ptr::from_exposed_addr_mut(heap_start);
+    let mut heap_start = unsafe { NonNull::new_unchecked(heap_start) };
+    unsafe {
+        heap_start.as_mut().next = None;
+        heap_start.as_mut().last = None;
+        heap_start.as_mut().size = core::mem::size_of::<Node>();
+    }
+    heap_start
+}
+
 unsafe impl GlobalAlloc for Alloc {
     unsafe fn alloc(&self, layout: core::alloc::Layout) -> *mut u8 {
         let lock = &mut *self.inner.lock();
@@ -198,18 +215,9 @@ unsafe impl GlobalAlloc for Alloc {
             usize::max(layout.align(), core::mem::align_of::<Node>()),
         );
 
-        if lock.first.is_none() {
-            let heap_start_align = 0x10000;
-            let addr = rlib::rt::heap_address();
-            let addr = addr as usize;
-            let addr = addr + core::mem::size_of::<Node>();
-            let addr = (addr + heap_start_align - 1) & !(heap_start_align - 1);
-            let heap_start = addr - core::mem::size_of::<Node>();
-            let heap_start: *mut Node = core::ptr::from_exposed_addr_mut(heap_start);
-            let mut heap_start = NonNull::new_unchecked(heap_start);
-            heap_start.as_mut().next = None;
-            heap_start.as_mut().last = None;
-            heap_start.as_mut().size = core::mem::size_of::<Node>();
+        if let Some(first) = lock.first {
+        } else {
+            let heap_start = gen_first_node();
             lock.first = Some(heap_start);
             lock.last = Some(heap_start);
         }
@@ -245,7 +253,9 @@ unsafe impl GlobalAlloc for Alloc {
             }
             next = node.as_ref().next;
         }
-        panic!("Failed to find a spot to fit node??? bruh");
+
+        rlib::arch::print_cstr(rlib::cstr!("Failed to find a spot to fit node??? bruh"));
+        rlib::arch::halt();
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: core::alloc::Layout) {
@@ -265,10 +275,8 @@ unsafe impl GlobalAlloc for Alloc {
                 }
             }
         } else {
-            panic!();
+            rlib::arch::halt();
         }
-
-        // crate::println!("dealloc {:?}, {:?}",node_start, node_start.as_ref().unwrap_unchecked());
     }
 }
 

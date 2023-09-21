@@ -66,6 +66,20 @@ pub fn print_cstr(str: &core::ffi::CStr) {
 }
 
 #[inline(always)]
+#[cfg(feature = "alloc")]
+pub fn print_string(str: &mut crate::alloc_crate::string::String) {
+    str.push('\0');
+    unsafe {
+        core::arch::asm!(
+            "syscall",
+            in("$2") PRINT_STRING,
+            in("$4") str.as_ptr() as u32,
+        )
+    }
+    str.pop();
+}
+
+#[inline(always)]
 pub fn print_str(str: &str) {
     for char in str.chars() {
         print_char(char)
@@ -237,7 +251,7 @@ pub fn sleep_ms(arg: i32) {
 
 #[inline]
 pub unsafe fn set_seed(rand_id: u32, seed: u32) {
-    core::arch::asm!{
+    core::arch::asm! {
         "syscall",
         in("$2") SET_RAND_SEED,
         in("$4") rand_id,
@@ -246,9 +260,9 @@ pub unsafe fn set_seed(rand_id: u32, seed: u32) {
 }
 
 #[inline]
-pub unsafe fn next_rand_int(rand_id: u32) -> u32 {
+pub unsafe fn next_rand_int(rand_id: u32) -> i32 {
     let out;
-    core::arch::asm!{
+    core::arch::asm! {
         "syscall",
         in("$2") GET_RAND_INT,
         inout("$4") rand_id => out
@@ -260,7 +274,7 @@ pub unsafe fn next_rand_int(rand_id: u32) -> u32 {
 pub unsafe fn next_rand_int_range(rand_id: u32, range: Range<i32>) -> i32 {
     let out: i32;
     let calc_bound = range.end - range.start;
-    core::arch::asm!{
+    core::arch::asm! {
         "syscall",
         in("$2") GET_RAND_INT_RANGE,
         inout("$4") rand_id => out,
@@ -273,7 +287,7 @@ pub unsafe fn next_rand_int_range(rand_id: u32, range: Range<i32>) -> i32 {
 pub unsafe fn next_rand_int_range_inclusive(rand_id: u32, range: RangeInclusive<i32>) -> i32 {
     let out: i32;
     let calc_bound = range.end() - range.start() + 1;
-    core::arch::asm!{
+    core::arch::asm! {
         "syscall",
         in("$2") GET_RAND_INT_RANGE,
         inout("$4") rand_id => out,
@@ -285,7 +299,7 @@ pub unsafe fn next_rand_int_range_inclusive(rand_id: u32, range: RangeInclusive<
 #[inline]
 pub unsafe fn next_rand_f32(rand_id: u32) -> f32 {
     let out;
-    core::arch::asm!{
+    core::arch::asm! {
         "syscall",
         in("$2") GET_RAND_FLOAT,
         in("$4") rand_id,
@@ -297,7 +311,7 @@ pub unsafe fn next_rand_f32(rand_id: u32) -> f32 {
 #[inline]
 pub unsafe fn next_rand_f64(rand_id: u32) -> f64 {
     let out;
-    core::arch::asm!{
+    core::arch::asm! {
         "syscall",
         in("$2") GET_RAND_DOUBLE,
         in("$4") rand_id,
@@ -467,7 +481,7 @@ pub const STDERR: FileDesciptor = FileDesciptor(2);
 pub struct FileDesciptor(u32);
 
 #[derive(Debug)]
-pub struct FileIOErrorCode(i32);
+pub struct FileIOErrorCode(pub i32);
 
 #[derive(Debug, Clone, Copy)]
 pub enum FileFlag {
@@ -495,6 +509,29 @@ pub unsafe fn open_file(
         Err(FileIOErrorCode(res))
     } else {
         Ok(FileDesciptor(res as u32))
+    }
+}
+
+#[inline(always)]
+pub unsafe fn read_file_raw(
+    file: &FileDesciptor,
+    buf: *mut u8,
+    size: usize,
+) -> Result<usize, FileIOErrorCode> {
+    let res: i32;
+    unsafe {
+        core::arch::asm! {
+            "syscall",
+            inout("$2") READ_FROM_FILE => res,
+            in("$4") file.0,
+            in("$5") buf,
+            in("$6") size
+        }
+    }
+    if res < 0 {
+        Err(FileIOErrorCode(res))
+    } else {
+        Ok(res as usize)
     }
 }
 
@@ -543,6 +580,34 @@ pub unsafe fn close_file(file: FileDesciptor) {
             "syscall",
             in("$2") CLOSE_FILE,
             in("$4") file.0
+        }
+    }
+}
+
+#[inline(always)]
+pub unsafe fn midi_out(pitch: u8, duration_ms: u32, instrument: u8, volume: u8) {
+    unsafe {
+        core::arch::asm! {
+            "syscall",
+            in("$2") MIDI_OUT,
+            in("$4") pitch,
+            in("$5") duration_ms,
+            in("$6") instrument,
+            in("$7") volume,
+        }
+    }
+}
+
+#[inline(always)]
+pub unsafe fn midi_out_sync(pitch: u8, duration_ms: u32, instrument: u8, volume: u8) {
+    unsafe {
+        core::arch::asm! {
+            "syscall",
+            in("$2") MIDI_OUT_SYNC,
+            in("$4") pitch,
+            in("$5") duration_ms,
+            in("$6") instrument,
+            in("$7") volume,
         }
     }
 }

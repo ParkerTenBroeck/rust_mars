@@ -6,7 +6,7 @@
   "executables": true,
   "features": "+mips1,+mips2,-ptr64,-gp64,+xgot,-soft-float",
   "llvm-target": "mipsel-unknown-none",
-  "singlethread": true,
+  "singlethread": false,
   "max-atomic-width": 32,
   "linker": "mipsel-linux-gnu-ld",
   "linker-flavor": "ld",
@@ -21,7 +21,8 @@
   "relocation-model": "static",
   "pre-link-args": {
     "ld": [
-        "--script=./link.map"
+        "--script=./link.map",
+        "--emit-relocs"
     ]
   },
   "llvm-args": [

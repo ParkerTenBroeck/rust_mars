@@ -14,6 +14,7 @@
 #![feature(unboxed_closures)]
 #![feature(fn_traits)]
 #![feature(tuple_trait)]
+#![feature(alloc_error_handler)]
 
 #[cfg(not(target_arch = "mips"))]
 compile_error!("ONLY MIPS ARCHITECTURE SUPPORTED");
@@ -27,8 +28,6 @@ pub mod io;
 pub mod rt;
 
 pub mod sync;
-
-pub use core::*;
 
 #[cfg(feature = "alloc")]
 extern crate alloc as alloc_crate;

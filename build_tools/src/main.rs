@@ -10,7 +10,7 @@ pub mod asm_pre_processor;
 
 fn main() {
     let args = std::env::args().skip(1).peekable(); // skip executable name
-    
+
     let mut run = false;
     let mut build = false;
     let mut clean = false;
@@ -102,7 +102,7 @@ pub fn build_vm_binary(name: &str) -> PathBuf {
     run_cmd.env("CFLAGS", "-fno-delayed-branch");
 
     run_cmd
-    .arg("+nightly")
+        .arg("+nightly")
         .arg("rustc")
         .arg("--release")
         .arg("--package")
@@ -111,10 +111,14 @@ pub fn build_vm_binary(name: &str) -> PathBuf {
         .arg("mips.json")
         .arg("-Zbuild-std=core,compiler_builtins,alloc")
         .arg("-Zbuild-std-features=compiler-builtins-mem")
-        // .arg("--")
-        // .arg("-C")
-        // .arg("opt-level=z")
-        ;
+        .arg("--")
+        .arg("-g")
+        .arg("-C")
+        .arg("opt-level=z")
+        .arg("-C")
+        .arg("lto")
+        .arg("-C")
+        .arg("embed-bitcode=yes");
 
     assert!(run_cmd.status().unwrap().success());
 

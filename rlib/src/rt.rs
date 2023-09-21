@@ -11,10 +11,8 @@ extern "C" fn _start() -> ! {
             "la $sp, _sp ",
             "move $fp, $sp",
             "jal main",
-            "1:",
             "li $2, 10",
             "syscall",
-            "b 1b",
             options(noreturn),
         }
     }
@@ -47,9 +45,20 @@ pub fn str_to_cstr<R>(str: &str, usage: impl FnOnce(&core::ffi::CStr) -> R) -> R
 
 #[panic_handler]
 #[cfg(feature = "provide_panic_handler")]
+#[inline(always)]
 fn panic(info: &core::panic::PanicInfo) -> ! {
-    crate::println!("PANIC AT THE DISCO: {:#?}", info);
-    loop {
-        crate::arch::halt();
-    }
+    // crate::println!("PANIC AT THE DISCO: {:#?}", info);
+    crate::arch::halt();
+}
+
+
+#[alloc_error_handler]
+#[inline(always)]
+fn my_example_handler(layout: core::alloc::Layout) -> ! {
+    crate::arch::print_cstr(crate::cstr!("memory allocation of "));
+    crate::arch::print_u32_hex(layout.size() as u32);
+    crate::arch::print_cstr(crate::cstr!(" bytes, allign: \n"));
+    crate::arch::print_u32_hex(layout.align() as u32);
+    crate::arch::print_cstr(crate::cstr!("  failed\n"));
+    crate::arch::halt();
 }

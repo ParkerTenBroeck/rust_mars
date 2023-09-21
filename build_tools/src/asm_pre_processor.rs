@@ -100,6 +100,7 @@ pub fn create_asm(binary: &Path) -> Result<PathBuf, Box<dyn std::error::Error>> 
         run_cmd.arg("-M");
         run_cmd.arg("no-aliases");
         run_cmd.arg("--no-show-raw-insn");
+        // run_cmd.arg("--demangle=rust");
 
         let output = run_cmd.output()?;
         let output = String::from_utf8(output.stdout)?;
@@ -248,32 +249,44 @@ pub fn pre_processes_text(vals: String) -> Result<String, Box<dyn std::error::Er
                 match ins.trim() {
                     "teq" => {
                         // let oper = oper.trim_end_matches(|c| matches!(c, ' '|'0'..='9',','));
-                        let oper = &oper[..5];
+                        let oper = &oper[..5]; //this is literally wrong
                         instructions.push((line.0, format!("{ins}\t{oper}")));
                     }
                     "negu" => {
                         let (left, right) = oper.split_once(',').expect("Malformed operands");
                         instructions.push((line.0, format!("subu\t{},$0,{}", left, right)));
                     }
-                    "divu" => {
-                        if oper.starts_with("$0") && oper.matches(',').count() == 2{
-                            instructions.push((line.0, format!("{ins}\t{}", oper.trim_start_matches("$0,"))))
-                        }else{
+                    "divu" | "div" => {
+                        if oper.starts_with("$0") && oper.matches(',').count() == 2 {
+                            instructions.push((
+                                line.0,
+                                format!("{ins}\t{}", oper.trim_start_matches("$0,")),
+                            ))
+                        } else {
                             instructions.push(line);
                         }
                     }
-                    "c.un.d" => {
+                    "c.olt.d" => {
+                        instructions.push((line.0, format!("c.lt.d\t{oper}")));
+                    }
+                    "c.ult.d" => {
+                        // lol this is wrong
                         instructions.push((line.0, "c.eq.d\t1,$f0,$f0".into()));
-                        // instructions.push((line.0, "c.eq.d 1,$f0,$f0".into()));
-                        // instructions.push((line.0, "c.eq.d 1,$f0,$f0".into()));
-                        // instructions.push((line.0, "c.eq.d 1,$f0,$f0".into()));
-                        // instructions.push((line.0, "c.eq.d 1,$f0,$f0".into()));
-                    },
+                    }
+                    "c.olt.s" => {
+                        instructions.push((line.0, format!("c.lt.s\t{oper}")));
+                    }
+                    "c.un.d" => {
+                        // lol this is wrong
+                        instructions.push((line.0, "c.eq.d\t1,$f0,$f0".into()));
+                    }
                     "c.un.s" => {
+                        // lol this is wrong
                         instructions.push((line.0, "c.eq.s\t1,$f0,$f0".into()));
-                        // instructions.push((line.0, "c.eq.s 1,$f0,$f0".into()));
-                    },
-                    "sync" => {} //skip
+                    }
+                    "sync" => {
+                        instructions.push((line.0, "sll\t$0,$0,0".into()));
+                    }
                     _ => {
                         instructions.push(line);
                     }
@@ -301,13 +314,13 @@ pub fn pre_processes_text(vals: String) -> Result<String, Box<dyn std::error::Er
     let mut last_addr = None;
 
     for (addr, instruction) in instructions.into_iter() {
-        if let Some(last_addr) = last_addr{
-            if last_addr + 4 != addr{
+        if let Some(last_addr) = last_addr {
+            if last_addr + 4 != addr {
                 // panic!("Address bruh: {last_addr} -> {addr}")
             }
         }
         last_addr = Some(addr);
-        
+
         if let Some(labels) = labels.remove(&addr) {
             res.push('\n');
             for label in labels {
