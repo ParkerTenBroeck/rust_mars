@@ -2,8 +2,7 @@
 members = [
 	"rlib",
 	"main",
-	"ll_alloc",
-	"build_tools"
+	# "ll_alloc"
 ]
 
 resolver = "2"

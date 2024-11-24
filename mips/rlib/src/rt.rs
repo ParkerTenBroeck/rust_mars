@@ -1,11 +1,9 @@
-use core::mem::MaybeUninit;
-
 #[no_mangle]
 #[naked]
 #[link_section = ".text.start"]
 extern "C" fn _start() -> ! {
     unsafe {
-        core::arch::asm! {
+        core::arch::naked_asm! {
             ".set noat",
             "la $gp, _gp",
             "la $sp, _sp ",
@@ -13,7 +11,7 @@ extern "C" fn _start() -> ! {
             "jal main",
             "li $2, 10",
             "syscall",
-            options(noreturn),
+            // options(noreturn),
         }
     }
 }
@@ -31,26 +29,27 @@ pub unsafe fn heap_address() -> *mut u8 {
     ret
 }
 
-pub fn str_to_cstr<R>(str: &str, usage: impl FnOnce(&core::ffi::CStr) -> R) -> R {
-    stackalloc::stackalloc_uninit::<u8, _, _>(str.len() + 1, |v| {
-        let v: &mut [u8] = unsafe {
-            str.as_ptr().copy_to(v.as_mut_ptr().cast(), str.len());
-            v.as_mut_ptr().add(str.len()).write(MaybeUninit::new(0));
-            core::mem::transmute(v)
-        };
-        let cstr = unsafe { core::ffi::CStr::from_ptr(v.as_ptr().cast()) };
-        usage(cstr)
-    })
+pub fn str_to_cstr<R>(_str: &str, _usage: impl FnOnce(&core::ffi::CStr) -> R) -> R {
+    todo!()
+    // stackalloc::stackalloc_uninit::<u8, _, _>(str.len() + 1, |v| {
+    //     let v: &mut [u8] = unsafe {
+    //         str.as_ptr().copy_to(v.as_mut_ptr().cast(), str.len());
+    //         v.as_mut_ptr().add(str.len()).write(MaybeUninit::new(0));
+    //         core::mem::transmute(v)
+    //     };
+    //     let cstr = unsafe { core::ffi::CStr::from_ptr(v.as_ptr().cast()) };
+    //     usage(cstr)
+    // })
 }
 
 #[panic_handler]
 #[cfg(feature = "provide_panic_handler")]
 #[inline(always)]
-fn panic(info: &core::panic::PanicInfo) -> ! {
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    crate::arch::print_cstr(c"panic");
     // crate::println!("PANIC AT THE DISCO: {:#?}", info);
     crate::arch::halt();
 }
-
 
 #[alloc_error_handler]
 #[inline(always)]

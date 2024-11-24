@@ -4,8 +4,6 @@
 #![feature(lang_items)]
 #![feature(allow_internal_unstable)]
 #![feature(asm_experimental_arch)]
-#![feature(strict_provenance)]
-#![feature(asm_const)]
 #![feature(naked_functions)]
 #![feature(linkage)]
 #![allow(incomplete_features)]
@@ -15,11 +13,6 @@
 #![feature(fn_traits)]
 #![feature(tuple_trait)]
 #![feature(alloc_error_handler)]
-
-#[cfg(not(target_arch = "mips"))]
-compile_error!("ONLY MIPS ARCHITECTURE SUPPORTED");
-#[cfg(not(target_endian = "little"))]
-compile_error!("NOT LITTLE ENDIAN");
 
 pub mod prelude;
 
@@ -36,4 +29,3 @@ extern crate alloc as alloc_crate;
 pub use alloc_crate::*;
 
 pub mod macros;
-pub use macros::*;

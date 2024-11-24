@@ -47,7 +47,7 @@ impl File {
     pub fn new_raw(path: &core::ffi::CStr, flag: FileFlag) -> Result<Self, FileIOErrorCode> {
         Ok(Self {
             descriptor: unsafe { crate::arch::open_file(path, flag) }?,
-            flag: flag,
+            flag,
         })
     }
 
@@ -67,7 +67,6 @@ impl File {
         unsafe { crate::arch::write_file(&mut self.descriptor, data) }
     }
 
-    #[cfg(feature = "alloc")]
     pub fn read_slice(&self, data: &mut [u8]) -> Result<usize, FileIOErrorCode> {
         unsafe { crate::arch::read_file(&self.descriptor, data) }
     }
@@ -75,9 +74,10 @@ impl File {
     #[cfg(feature = "alloc")]
     pub fn read_to_string(self) -> Result<String, FileIOErrorCode> {
         let vec = self.read_to_vec()?;
-        String::from_utf8(vec).map_err(|_|FileIOErrorCode(1))
+        String::from_utf8(vec).map_err(|_| FileIOErrorCode(1))
     }
 
+    #[cfg(feature = "alloc")]
     pub fn read_to_vec(self) -> Result<Vec<u8>, FileIOErrorCode> {
         let mut data = Vec::with_capacity(32);
 
@@ -87,14 +87,14 @@ impl File {
                 crate::arch::read_file_raw(&self.descriptor, spare.as_mut_ptr().cast(), spare.len())
             }?;
 
-            unsafe{
+            unsafe {
                 let new_len = data.len() + read;
                 data.set_len(new_len)
             }
 
-            if data.len() < data.capacity(){
+            if data.len() < data.capacity() {
                 break;
-            }else{
+            } else {
                 data.reserve(1);
             }
         }

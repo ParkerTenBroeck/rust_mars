@@ -47,11 +47,11 @@ unsafe fn calc_next(node: NonNull<Node>, layout: core::alloc::Layout) -> NodeCal
     let addr = (addr + layout.align() - 1) & !(layout.align() - 1);
 
     let next_node_start = addr - core::mem::size_of::<Node>();
-    let next_node_start: *mut Node = core::ptr::from_exposed_addr_mut(next_node_start);
+    let next_node_start: *mut Node = next_node_start as *mut Node;
     let next_node_start = NonNull::new_unchecked(next_node_start);
     let next_size =
         (layout.size() + core::mem::size_of::<Node>() + layout.align() - 1) & !(layout.align() - 1);
-    let addr = core::ptr::from_exposed_addr_mut(addr);
+    let addr = addr as *mut Node;
 
     if let Some(existing_next) = node.as_ref().next {
         // if the end of this node is less than the start of the next node
@@ -145,11 +145,11 @@ impl AllocInner {
         let addr = (addr + layout.align() - 1) & !(layout.align() - 1);
 
         let next_node_start = addr - core::mem::size_of::<Node>();
-        let next_node_start: *mut Node = core::ptr::from_exposed_addr_mut(next_node_start);
+        let next_node_start: *mut Node = next_node_start as *mut Node;
         let next_node_ptr = NonNull::new_unchecked(next_node_start);
         let next_size = (layout.size() + core::mem::size_of::<Node>() + layout.align() - 1)
             & !(layout.align() - 1);
-        let addr = core::ptr::from_exposed_addr_mut(addr);
+        let addr = addr as *mut Node;
 
         if let Some(existing_next) = node.as_ref().next {
             // if the end of this node is less than the start of the next node
@@ -196,7 +196,7 @@ fn gen_first_node() -> NonNull<Node> {
     let addr = addr + core::mem::size_of::<Node>();
     let addr = (addr + heap_start_align - 1) & !(heap_start_align - 1);
     let heap_start = addr + core::mem::size_of::<Node>();
-    let heap_start: *mut Node = core::ptr::from_exposed_addr_mut(heap_start);
+    let heap_start: *mut Node = heap_start as *mut Node;
     let mut heap_start = unsafe { NonNull::new_unchecked(heap_start) };
     unsafe {
         heap_start.as_mut().next = None;

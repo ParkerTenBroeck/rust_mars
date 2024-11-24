@@ -52,6 +52,42 @@ impl Note {
             Note::C => 12,
         }
     }
+
+    #[inline(always)]
+    pub const fn from_num(val: u8) -> Option<Self> {
+        Some(match val {
+            1 => Note::Cs,
+            2 => Note::D,
+            3 => Note::Ds,
+            4 => Note::E,
+            5 => Note::F,
+            6 => Note::Fs,
+            7 => Note::G,
+            8 => Note::Gs,
+            9 => Note::A,
+            10 => Note::As,
+            11 => Note::B,
+            12 => Note::C,
+            _ => return None,
+        })
+    }
+
+    pub const fn major_nodes() -> [Self; 12] {
+        [
+            Self::Cs,
+            Self::D,
+            Self::Ds,
+            Self::E,
+            Self::F,
+            Self::Fs,
+            Self::G,
+            Self::Gs,
+            Self::A,
+            Self::As,
+            Self::B,
+            Self::C,
+        ]
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -75,10 +111,15 @@ macro_rules! from_u8 {
                     _ => Err(())
                 }
             }
+
+            pub fn name(&self) -> &'static str{
+                match self{
+                    $(Self::$vari_name => stringify!($vari_name), )*
+                }
+            }
         }
     };
 }
-
 from_u8! {
     #[repr(u8)]
     #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -294,11 +335,8 @@ impl Pitch {
         }
         octave *= 12;
         let pitch = octave + note.to_num();
-        if pitch < 0 {
-            Self { pitch: 0 }
-        } else {
-            Self { pitch: pitch as u8 }
-        }
+    
+        Self { pitch }
     }
 
     #[inline(always)]
@@ -306,7 +344,7 @@ impl Pitch {
         if pitch > 127 {
             Self { pitch: 127 }
         } else {
-            Self { pitch: pitch }
+            Self { pitch }
         }
     }
 }

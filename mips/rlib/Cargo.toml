@@ -8,7 +8,7 @@ description = "A rust standard library of sorts giving access to a hopfuly faith
 
 [dependencies]
 spin = "0.9.4"
-stackalloc = {version = "*", features=["no_std"]}
+# stackalloc = {version = "*", features=["no_std"]}
 
 [features]
 default = ["provide_panic_handler"]

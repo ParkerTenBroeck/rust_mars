@@ -55,16 +55,14 @@ fn main() {
     if run {
         let mut run_cmd = Command::new("java");
         run_cmd.arg("-jar");
-        let mut path = workspace_path();
-        path.push("Mars4_5.jar");
+        let path = Path::new("../Mars4_5.jar");
         run_cmd.arg(path.to_str().expect("Failed to make MARS jar path"));
 
         run_cmd.arg("we");
         run_cmd.arg("np");
         run_cmd.arg(
             asm.as_ref()
-                .map(|f| f.to_str())
-                .flatten()
+                .and_then(|f| f.to_str())
                 .ok_or("Failed to get/make asm path")
                 .unwrap(),
         );
@@ -96,7 +94,11 @@ pub fn workspace_path() -> PathBuf {
 
 pub fn build_vm_binary(name: &str) -> PathBuf {
     let mut run_cmd = Command::new("cargo");
-    run_cmd.current_dir(std::env::current_dir().unwrap());
+
+    let mut dir = std::env::current_dir().unwrap();
+    dir.pop();
+    dir.push("mips");
+    run_cmd.current_dir(&dir);
 
     run_cmd.env("CC", "mipsel-linux-gnu-gcc");
     run_cmd.env("CFLAGS", "-fno-delayed-branch");
@@ -109,7 +111,7 @@ pub fn build_vm_binary(name: &str) -> PathBuf {
         .arg(name)
         .arg("--target")
         .arg("mips.json")
-        .arg("-Zbuild-std=core,compiler_builtins,alloc")
+        .arg("-Zbuild-std=core,compiler_builtins")
         .arg("-Zbuild-std-features=compiler-builtins-mem")
         .arg("--")
         .arg("-g")
@@ -122,12 +124,11 @@ pub fn build_vm_binary(name: &str) -> PathBuf {
 
     assert!(run_cmd.status().unwrap().success());
 
-    let mut path = workspace_path();
-    path.push("target");
-    path.push("mips");
-    path.push("release");
-    path.push(name);
-    path
+    dir.push("target");
+    dir.push("mips");
+    dir.push("release");
+    dir.push(name);
+    dir
 }
 
 // pub fn create_raw_binary(name: &str) -> PathBuf {

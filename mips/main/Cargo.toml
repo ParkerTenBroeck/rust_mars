@@ -1,0 +1,12 @@
+[package]
+name = "main"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rlib = { path = "../rlib", features = []}
+# ll_alloc ={ path = "../ll_alloc" }
+# [profile.release]
+# opt-level = 'z' 
+
+midly = {version = "*", default-features = false}

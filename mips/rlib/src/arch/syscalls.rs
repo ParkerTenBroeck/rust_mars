@@ -49,7 +49,7 @@ pub fn sbrk(size: u32) -> &'static mut [u8] {
             inout("$2") ret1,
             in("$4") size,
         );
-        let ptr: *mut u8 = core::mem::transmute(ret1);
+        let ptr: *mut u8 = ret1 as usize as *mut u8;
         core::slice::from_raw_parts_mut(ptr, size as usize)
     }
 }
@@ -87,7 +87,7 @@ pub fn print_str(str: &str) {
 }
 
 pub fn read_stdin(buf: &mut [u8]) -> usize {
-    if buf.len() == 0 {
+    if buf.is_empty() {
         return 0;
     }
     if buf.len() == 1 {
@@ -121,6 +121,17 @@ pub fn read_stdin_char() -> char {
 
 #[inline(always)]
 pub fn print_char(char: char) {
+    unsafe {
+        core::arch::asm!(
+            "syscall",
+            in("$2") PRINT_CHARACTER,
+            in("$4") char as u32,
+        )
+    }
+}
+
+#[inline(always)]
+pub fn print_byte(char: u8) {
     unsafe {
         core::arch::asm!(
             "syscall",
